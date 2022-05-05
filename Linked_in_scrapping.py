@@ -123,7 +123,8 @@ with open('output.csv', 'w',  newline = '') as file_output:
                 pass
         sleep(2)
         #print('222222222222')
-        driver.execute_script('window.scrollTo(0, document.body.scrollHeight);') #scroll to the end of the page
+        #scroll down to the end of the page
+        driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
         sleep(2)
         #print('3333333333')
         next_button = driver.find_element_by_class_name('artdeco-pagination__button--next')
@@ -132,3 +133,29 @@ with open('output.csv', 'w',  newline = '') as file_output:
         next_button.click()
         sleep(2)
         print(len(url_all_page))
+
+print('\n-----------Succesfully get all url pages------\n')
+##############################
+# get info from urls for all pages
+##############################
+
+with open('output.csv', 'w',  newline = '') as file_output:
+    headers = ['Name', 'Job Title', 'Location','Current Cumppany', 'URL']
+    writer = csv.DictWriter(file_output, delimiter=',', lineterminator='\n',fieldnames=headers)
+    writer.writeheader()
+    for linkedin_URL in url_all_page:
+        driver.get(linkedin_URL)
+        print('- Accessing profile: ', linkedin_URL)
+        sleep(3)
+        page_source = BeautifulSoup(driver.page_source, "html.parser")
+        try:
+            name = page_source.find('h1', class_='text-heading-xlarge inline t-24 v-align-middle break-words').get_text().strip() #Remove unnecessary characters
+            title = page_source.find('div', class_='text-body-medium break-words').get_text().strip()
+            location = page_source.find('span', class_='text-body-small inline t-black--light break-words').get_text().strip() #Remove unnecessary characters
+            current_cumppany = page_source.find('div', class_='inline-show-more-text inline-show-more-text--is-collapsed inline-show-more-text--is-collapsed-with-line-clamp inline').get_text().strip()
+            writer.writerow({headers[0]:name, headers[1]:title, headers[2]:location, headers[3]:current_cumppany, headers[4]:linkedin_URL})
+        except:
+            pass
+
+
+print('\n-----------Succesfully get all info from url pages------\n')
